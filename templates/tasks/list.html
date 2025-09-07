@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Añadir tarea</h2>
+<form id="task-form" method="post" action="{% url 'task_create' %}">
+  {% csrf_token %}
+
+  <!-- fila: título + botón -->
+  <div style="display: flex; align-items: center; gap: 8px;">
+    {{ form.title }}
+    <button type="submit" style="padding: 4px 10px; font-size: 18px;">+</button>
+  </div>
+
+  <!-- fila: descripción -->
+  <div style="margin-top: 8px;">
+    {{ form.description }}
+  </div>
+</form>
+
+<h2>Lista de tareas</h2>
+<ul>
+  {% for task in tasks %}
+    <li>
+      {% if task.completed %}
+        <s>{{ task.title }}</s>
+      {% else %}
+        {{ task.title }}
+      {% endif %}
+      -
+      <a href="{% url 'toggle_task' task.id %}">✔</a>
+      <form method="post" action="{% url 'delete_task' task.id %}" style="display:inline">
+        {% csrf_token %}
+        <button type="submit">🗑</button>
+      </form>
+
+      {% if task.description %}
+        <div style="color: gray; margin-left: 20px; font-size: 0.9em;">
+          {{ task.description }}
+        </div>
+      {% endif %}
+    </li>
+  {% empty %}
+    <li>No hay tareas.</li>
+  {% endfor %}
+</ul>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("task-form");
+    const titleInput = form.querySelector("input[name='title']");
+
+    if (titleInput) titleInput.focus();
+
+    form.addEventListener("submit", () => {
+      setTimeout(() => {
+        if (titleInput) titleInput.focus();
+      }, 100);
+    });
+  });
+</script>
+{% endblock %}
